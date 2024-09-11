@@ -19,12 +19,13 @@ st.set_page_config(layout="wide", page_title='Database Data Entry Application')
 # Function to connect to the database
 def connect_db():
     # Set up a connection string
-    username = st.secrets['user']
-    password = st.secrets['pw']
-    host = 'telrichserver.postgres.database.azure.com'
+    username = st.secrets['database']['user']
+    password = st.secrets['database']['pw']
+    host = 'localhost'
     database = 'phone_db'
     port = '5432'  # or your specified port number
-    sslmode = 'require'  # or 'prefer' if you don't want to use SSL encryption
+    # sslmode = 'require'  # or 'prefer' if you don't want to use SSL encryption
+    sslmode = 'prefer'  # or 'prefer' if you don't want to use SSL encryption
     conn_str = f"postgresql://{username}:{password}@{host}:{port}/{database}?sslmode={sslmode}"
     return conn_str
 
@@ -68,11 +69,12 @@ with col1.expander(label='', expanded=True):
     sold_date = st.date_input('Enter sold date')
     cost_price = st.number_input('Enter cost price')
     sold_price = st.number_input('Enter sold price')
+    profit = sold_price - cost_price
 
     # Saving the entry to the database.
     if st.button('Save Details'):
-        query = f'''INSERT INTO phone_sales (phone_brand, phone_model, purchase_date, sold_date, sold_price, cost_price)
-        VALUES ('{phone_brand}', '{phone_model}', '{purchase_date}', '{sold_date}', '{sold_price}', '{cost_price}')'''
+        query = f'''INSERT INTO phone_sales (phone_brand, phone_model, purchase_date, sold_date, sold_price, cost_price, profit)
+        VALUES ('{phone_brand}', '{phone_model}', '{purchase_date}', '{sold_date}', '{sold_price}', '{cost_price}', '{profit}')'''
         cur.execute(query)
         conn.commit()
 
@@ -269,7 +271,7 @@ with col2.expander('Documentation'):
             
              """)
 
-    # st.markdown('<iframe title="Report Section" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjI2MTYzNTMtOGZmZC00ZDA3LThkYTktYjJjN2U0MGQzYjYxIiwidCI6ImNlMzBlNGMzLWM4NjItNGVlZC1hMzdjLWU3NmJjODNhY2ZmYSJ9" frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+    st.markdown('<iframe title="Report Section" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjI2MTYzNTMtOGZmZC00ZDA3LThkYTktYjJjN2U0MGQzYjYxIiwidCI6ImNlMzBlNGMzLWM4NjItNGVlZC1hMzdjLWU3NmJjODNhY2ZmYSJ9" frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
     
 
 # Close the database connection
